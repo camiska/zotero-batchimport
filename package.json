@@ -1,7 +1,7 @@
 {
   "name": "zotero-batchimport",
   "type": "module",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "packageManager": "npm@10.8.2",
   "description": "Import epubs and pdfs in folders safely in batches",
   "config": {
