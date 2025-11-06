@@ -1,4 +1,4 @@
-![Image of the Batch-Import Cat](/addon/content/icons/batchimport_sleepy_icon.svg)
+![Image of the Batch-Import Cat](/addon/content/icons/batchimport_sleepy_icon.png)
 
 # Batch-Import Plugin for Zotero 7+/8
 
