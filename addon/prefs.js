@@ -1,0 +1,11 @@
+pref("enable", true);
+pref("input", "This is input");
+pref("includeSubfolders", true);
+pref("subfoldersToSubcollections", false);
+pref("tagDuplicates", false);
+pref("importPDF", true);
+pref("importEPUB", true);
+pref("importHTML", false);
+pref("importOtherTypes", false);
+pref("retrieveMetadata", true);
+pref("showToolbarButton", false);

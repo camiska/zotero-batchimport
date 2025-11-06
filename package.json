@@ -1,0 +1,69 @@
+{
+  "name": "zotero-batchimport",
+  "type": "module",
+  "version": "1.0.0",
+  "packageManager": "npm@10.8.2",
+  "description": "Import epubs and pdfs in folders safely in batches",
+  "config": {
+    "addonName": "Batch Import",
+    "addonID": "zotero-batchimport@camiska",
+    "addonRef": "batchimport",
+    "addonInstance": "BatchImport",
+    "prefsPrefix": "extensions.zotero.batchimport"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camiska/zotero-batchimport.git"
+  },
+  "author": "camiska",
+  "bugs": {
+    "url": "https://github.com/camiska/zotero-batchimport/issues"
+  },
+  "homepage": "https://github.com/camiska/zotero-batchimport",
+  "license": "MIT",
+  "scripts": {
+    "start": "zotero-plugin serve",
+    "build": "zotero-plugin build && tsc --noEmit",
+    "lint:check": "prettier --check . && eslint .",
+    "lint:fix": "prettier --write . && eslint . --fix",
+    "release": "zotero-plugin release",
+    "test": "zotero-plugin test",
+    "update-deps": "npm update --save"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/chai": "^5.2.3",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.10.0",
+    "@zotero-plugin/eslint-config": "^0.6.7",
+    "chai": "^6.2.0",
+    "eslint": "^9.39.1",
+    "mocha": "^11.7.4",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.3",
+    "zotero-plugin-scaffold": "^0.8.1",
+    "zotero-types": "^4.1.0-beta.4"
+  },
+  "dependencies": {
+    "zotero-plugin-toolkit": "^5.1.0-beta.12"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "tabWidth": 2,
+    "endOfLine": "lf",
+    "overrides": [
+      {
+        "files": [
+          "*.xhtml"
+        ],
+        "options": {
+          "htmlWhitespaceSensitivity": "css"
+        }
+      }
+    ]
+  }
+}

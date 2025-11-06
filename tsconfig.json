@@ -1,0 +1,33 @@
+{
+  "extends": "zotero-types/entries/sandbox/",
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "types": ["node"],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "importHelpers": false,
+    "skipLibCheck": true,
+    "declaration": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "strict": false,
+    "sourceMap": true,
+    "downlevelIteration": true,
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": [
+    "src",
+    "typings",
+    "node_modules/zotero-types",
+    "./*.ts",
+    "./*.mjs",
+    "./*.js"
+  ]
+}
