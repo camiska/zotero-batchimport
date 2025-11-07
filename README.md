@@ -26,9 +26,11 @@ Batch-import files from a folder (if you want to also including subfolders) or s
 
 To the Zotero Community and especially to the Plugin Developers here on Github, especially for [zotero-plugin-scaffold](https://github.com/zotero-plugin-dev/zotero-plugin-scaffold), [zotero-plugin-toolkit](https://github.com/windingwind/zotero-plugin-toolkit), [zotero-plugin-template](https://github.com/windingwind/zotero-plugin-template), [zotero-types](https://github.com/windingwind/zotero-types) and [zotero-folder-import](https://github.com/retorquere/zotero-folder-import)!
 
-Also big thanks for [zotero](https://www.zotero.org/)
-I was always using zotero-folder-import, but since it wasn't updated for 8 and I needed to organize my research things that was only in local folders, I wrote this. I am in no means a professional, so please feel free to point out any errors or feedback.
+Also big thanks for [zotero](https://www.zotero.org/) and the Zotero Team.
+I was always using zotero-folder-import, but since it wasn't updated for 8 and I needed to organize my research things that was only in local folders, I wrote this. I am in no means a professional, so please feel free to point out any errors or feedback. 
+
+Currently I am quite confused as to which methods, functions, helpers etc to use because of the state of the beta and varying or too advanced information and I am new to this all.
 
 ## License
 
-MIT
+AGPLv3
