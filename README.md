@@ -19,7 +19,7 @@ Batch-import files from a folder (if you want to also including subfolders) or s
 
 ## Install
 
-- Download the latest `.xpi` from the Releases page of https://github.com/camiska/zotero-batchimport
+- Download the latest `.xpi` from the Releases page [here](https://github.com/camiska/zotero-batchimport/releases)
 - In Zotero: Tools > Add-ons > Gear icon > Install Add-on From File > select the XPI
 
 ## Credits and Thanks
