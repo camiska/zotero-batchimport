@@ -28,23 +28,31 @@ async function onStartup() {
   addon.data.initialized = true;
 }
 
-async function onMainWindowLoad(win: _ZoteroTypes.MainWindow): Promise<void> {
+async function onMainWindowLoad(_win: _ZoteroTypes.MainWindow): Promise<void> {
   addon.data.ztoolkit = createZToolkit();
 
-  ztoolkit.Menu.register("menuTools", {
-    tag: "menuitem",
-    id: `${addon.data.config.addonRef}-batch-import-menu`,
-    label: "Batch Import...",
-    icon: `chrome://${addon.data.config.addonRef}/content/icons/batchimport_cat_icon.svg`,
-    styles: {
-      listStyleImage: `url('chrome://${addon.data.config.addonRef}/content/icons/batchimport_cat_icon.svg')`,
-      minWidth: "20px",
-      minHeight: "20px",
-    },
-    commandListener: async () => {
-      const mod = await import("./modules/batchImport.ts");
-      await mod.BatchImport.run();
-    },
+  const win = Zotero.getMainWindow();
+  if (win && win.MozXULElement) {
+    win.MozXULElement.insertFTLIfNeeded(
+      `${addon.data.config.addonRef}-mainWindow.ftl`,
+    );
+  }
+
+  Zotero.MenuManager.registerMenu({
+    menuID: `${addon.data.config.addonRef}-batch-import`,
+    pluginID: addon.data.config.addonID,
+    target: "main/menubar/tools",
+    menus: [
+      {
+        menuType: "menuitem",
+        l10nID: "batchimport-menu-batch-import",
+        icon: `chrome://${addon.data.config.addonRef}/content/icons/batchimport_cat_icon.svg`,
+        onCommand: async () => {
+          const mod = await import("./modules/batchImport.js");
+          await mod.BatchImport.run();
+        },
+      },
+    ],
   });
 
   const showToolbarButton = getPref("showToolbarButton") ?? false;
@@ -93,7 +101,7 @@ function registerToolbarButton(): void {
         {
           type: "command",
           listener: async () => {
-            const mod = await import("./modules/batchImport.ts");
+            const mod = await import("./modules/batchImport.js");
             await mod.BatchImport.run();
           },
         },
@@ -120,7 +128,7 @@ function unregisterToolbarButton(): void {
   }
 }
 
-async function onMainWindowUnload(win: Window): Promise<void> {
+async function onMainWindowUnload(_win: Window): Promise<void> {
   ztoolkit.unregisterAll();
   addon.data.dialog?.window?.close();
 }
@@ -154,11 +162,11 @@ async function onPrefsEvent(type: string, data: { [key: string]: any }) {
   }
 }
 
-function onShortcuts(type: string) {
+function onShortcuts(_type: string) {
   return;
 }
 
-function onDialogEvents(type: string) {
+function onDialogEvents(_type: string) {
   return;
 }
 

@@ -1,3 +1,5 @@
+batchimport-menu-batch-import = Batch Import...
+
 item-section-example1-head-text =
     .label = Plugin Template: Item Info
 item-section-example1-sidenav-tooltip =

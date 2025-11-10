@@ -1,33 +1,37 @@
 {
   "extends": "zotero-types/entries/sandbox/",
   "compilerOptions": {
-    "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "resolveJsonModule": true,
-    "types": ["node"],
-    "lib": ["ESNext", "DOM", "DOM.Iterable"],
-    "importHelpers": false,
-    "skipLibCheck": true,
-    "declaration": true,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitAny": false,
-    "strict": false,
-    "sourceMap": true,
-    "downlevelIteration": true,
-    "esModuleInterop": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
+    "target": "ES2022",
+    "lib": [
+      "ES2022"
+    ],
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "forceConsistentCasingInFileNames": true
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "incremental": true
   },
   "include": [
     "src",
     "typings",
-    "node_modules/zotero-types",
-    "./*.ts",
-    "./*.mjs",
-    "./*.js"
+    "node_modules/zotero-types"
+  ],
+  "exclude": [
+    "build",
+    "addon"
   ]
 }

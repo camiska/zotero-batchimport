@@ -1,5 +1,5 @@
 import { config } from "../package.json";
-import { ColumnOptions, DialogHelper } from "zotero-plugin-toolkit";
+import { DialogHelper } from "zotero-plugin-toolkit";
 import hooks from "./hooks";
 import { createZToolkit } from "./utils/ztoolkit";
 
@@ -18,8 +18,6 @@ class Addon {
     };
     prefs?: {
       window: Window;
-      columns: Array<ColumnOptions>;
-      rows: Array<{ [dataKey: string]: string }>;
     };
     dialog?: DialogHelper;
   };

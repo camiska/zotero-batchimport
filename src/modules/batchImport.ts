@@ -1,9 +1,6 @@
 import { getPref } from "../utils/prefs";
 import { delay } from "../utils/wait";
-import {
-  BatchProgressWindow,
-  ProgressState,
-} from "../utils/BatchProgressWindow";
+import { BatchProgressWindow } from "../utils/BatchProgressWindow";
 import { showBatchSummary } from "../utils/BatchSummaryDialog";
 
 const BATCH_SIZE_DEFAULT = 50;
@@ -15,6 +12,7 @@ export class BatchImport {
         tag: "menuitem",
         id: `${addon.data.config.addonRef}-batch-import-menu`,
         label: "Batch Import PDFs…",
+        icon: `chrome://${addon.data.config.addonRef}/content/icons/batchimport_cat_icon.svg`,
         commandListener: async () => {
           try {
             await BatchImport.run();
@@ -36,17 +34,18 @@ export class BatchImport {
   static async run() {
     const win = Zotero.getMainWindow();
 
-    const includeSubfolders = getPref("includeSubfolders") ?? true;
-    const subfoldersToSubcollections =
-      getPref("subfoldersToSubcollections") ?? false;
-    const tagDuplicates = getPref("tagDuplicates") ?? false;
+    const includeSubfolders = Boolean(getPref("includeSubfolders") ?? true);
+    const subfoldersToSubcollections = Boolean(
+      getPref("subfoldersToSubcollections") ?? false,
+    );
+    const tagDuplicates = Boolean(getPref("tagDuplicates") ?? false);
 
-    const importPDF = getPref("importPDF") ?? true;
-    const importEPUB = getPref("importEPUB") ?? true;
-    const importHTML = getPref("importHTML") ?? false;
-    const importOtherTypes = getPref("importOtherTypes") ?? false;
+    const importPDF = Boolean(getPref("importPDF") ?? true);
+    const importEPUB = Boolean(getPref("importEPUB") ?? true);
+    const importHTML = Boolean(getPref("importHTML") ?? false);
+    const importOtherTypes = Boolean(getPref("importOtherTypes") ?? false);
 
-    const retrieveMetadata = getPref("retrieveMetadata") ?? true;
+    const retrieveMetadata = Boolean(getPref("retrieveMetadata") ?? true);
 
     const fileTypes = { importPDF, importEPUB, importHTML, importOtherTypes };
 
@@ -237,19 +236,96 @@ export class BatchImport {
           },
         });
 
-        const recognizer = (Zotero as any).PDFRecognizer;
-        if (recognizer && typeof recognizer.recognize === "function") {
-          const maybePromise = recognizer.recognize(metadataEligibleIDs);
-          if (maybePromise && typeof maybePromise.then === "function") {
-            await maybePromise;
+        ztoolkit.log(
+          `Starting metadata retrieval for ${metadataEligibleIDs.length} items`,
+        );
+
+        const metadataBatchSize = 10;
+        const metadataBatches = Math.ceil(
+          metadataEligibleIDs.length / metadataBatchSize,
+        );
+
+        for (
+          let i = 0;
+          i < metadataEligibleIDs.length;
+          i += metadataBatchSize
+        ) {
+          if (cancelled) break;
+
+          const batchIDs = metadataEligibleIDs.slice(i, i + metadataBatchSize);
+          const batchNum = Math.floor(i / metadataBatchSize) + 1;
+
+          ztoolkit.log(
+            `Processing metadata batch ${batchNum}/${metadataBatches} (${batchIDs.length} items)`,
+          );
+
+          try {
+            const batchItems = batchIDs.map((id) => Zotero.Items.get(id));
+
+            if (
+              typeof (Zotero as any).RecognizePDF !== "undefined" &&
+              typeof (Zotero as any).RecognizePDF.autoRecognizeItems ===
+                "function"
+            ) {
+              ztoolkit.log("Using Zotero.RecognizePDF.autoRecognizeItems");
+              await (Zotero as any).RecognizePDF.autoRecognizeItems(batchItems);
+            }
+            else if (
+              typeof (Zotero as any).getActiveZoteroPane === "function"
+            ) {
+              ztoolkit.log("Using ZoteroPane.recognizeSelected");
+              const zoteroPane = (Zotero as any).getActiveZoteroPane();
+              if (zoteroPane) {
+                await zoteroPane.selectItems(batchIDs);
+                await zoteroPane.recognizeSelected();
+              }
+            }
+            else {
+              ztoolkit.log("Using individual item recognition");
+              for (const item of batchItems) {
+                try {
+                  if (
+                    typeof (Zotero as any).RecognizePDF !== "undefined" &&
+                    typeof (Zotero as any).RecognizePDF.recognize === "function"
+                  ) {
+                    await (Zotero as any).RecognizePDF.recognize(item);
+                  }
+                } catch (itemError: any) {
+                  ztoolkit.log(
+                    `Error recognizing item ${item.id}: ${String(itemError)}`,
+                  );
+                }
+              }
+            }
+
+            recognizedTriggered += batchIDs.length;
+
+            const progressPct = Math.round(
+              ((i + batchIDs.length) / metadataEligibleIDs.length) * 100,
+            );
+            progress.updateProgress({
+              retrievingMetadata: {
+                progress: progressPct,
+                done: false,
+              },
+            });
+
+            await delay(3000);
+          } catch (batchError: any) {
+            ztoolkit.log(
+              `Metadata batch ${batchNum}/${metadataBatches} error:`,
+              batchError,
+            );
+            errors.push(
+              `Metadata batch ${batchNum} error: ${String(batchError)}`,
+            );
+            await delay(1000);
           }
-        } else {
-          await (pane as any).selectItems({ items: metadataEligibleIDs });
-          pane.recognizeSelected();
-          await delay(250);
         }
 
-        recognizedTriggered = metadataEligibleIDs.length;
+        ztoolkit.log(
+          `Metadata retrieval completed. Triggered for ${recognizedTriggered} items`,
+        );
 
         progress.updateProgress({
           retrievingMetadata: {
@@ -258,6 +334,7 @@ export class BatchImport {
           },
         });
       } catch (e: any) {
+        ztoolkit.log("Metadata retrieval error:", e);
         errors.push(`metadata retrieval error: ${String(e)}`);
         progress.updateProgress({
           retrievingMetadata: {
@@ -353,39 +430,39 @@ export class BatchImport {
 
     if (buttonPressed === 1) {
       try {
+        const { FilePicker } = ChromeUtils.importESModule(
+          "chrome://zotero/content/modules/filePicker.mjs",
+        ) as any;
+        const fp = new FilePicker();
+        fp.init(Zotero.getMainWindow(), "Select Folder", fp.modeGetFolder);
+        fp.appendFilters(fp.filterAll);
+        const rv = await fp.show();
+        
+        if (rv === fp.returnOK && fp.file) {
+          const path = fp.file;
+          const f = Zotero.File.pathToFile(path);
+          if (f.exists() && f.isDirectory()) {
+            return { mode: "folder", folder: f };
+          }
+        }
+      } catch (e) {
+        ztoolkit.log("Zotero FilePicker failed", e);
+      }
+
+      try {
         const fp: any = new (ztoolkit as any).FilePicker(
           "Select Folder",
           "folder",
         );
         const path = await fp.open();
         if (path) {
-          const f = Components.classes[
-            "@mozilla.org/file/local;1"
-          ].createInstance(Components.interfaces.nsIFile);
-          f.initWithPath(path);
+          const f = Zotero.File.pathToFile(path);
           if (f.exists() && f.isDirectory()) {
             return { mode: "folder", folder: f };
           }
         }
       } catch (e) {
         ztoolkit.log("Toolkit folder picker failed", e);
-      }
-
-      try {
-        const fp = Components.classes[
-          "@mozilla.org/filepicker;1"
-        ].createInstance(Components.interfaces.nsIFilePicker);
-        fp.init(
-          win,
-          "Select Folder",
-          Components.interfaces.nsIFilePicker.modeGetFolder,
-        );
-        const rv = await new Promise<number>((resolve) => fp.open(resolve));
-        if (rv === Components.interfaces.nsIFilePicker.returnOK && fp.file) {
-          return { mode: "folder", folder: fp.file as nsIFile };
-        }
-      } catch (e) {
-        ztoolkit.log("Folder picker failed", e);
       }
     } else if (buttonPressed === 2) {
       ztoolkit.log("[Batch Import] Opening file picker for multiple files");
@@ -519,9 +596,11 @@ export class BatchImport {
     const walk = (dir: nsIFile) => {
       const entries = dir.directoryEntries;
       while (entries.hasMoreElements()) {
-        const entry = entries
-          .getNext()
-          .QueryInterface(Components.interfaces.nsIFile);
+        const next = entries.getNext();
+        if (!next || !next.QueryInterface) continue;
+        const entry = next.QueryInterface(
+          Components.interfaces.nsIFile,
+        ) as nsIFile;
         if (entry.isDirectory()) {
           if (recursive) walk(entry);
         } else if (pattern.test(entry.leafName)) {

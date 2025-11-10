@@ -1,0 +1,53 @@
+/* Batch Import Plugin Styles */
+
+/* Main window styles */
+#batchimport-toolbar-button {
+  list-style-image: url("chrome://batchimport/content/icons/batchimport_cat_icon.svg");
+  margin-left: 4px;
+  margin-right: 4px;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+/* Preferences pane styles */
+#zotero-prefpane-batchimport {
+  padding: 10px;
+}
+
+#zotero-prefpane-batchimport groupbox {
+  margin-bottom: 10px;
+}
+
+#zotero-prefpane-batchimport separator {
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+#zotero-prefpane-batchimport checkbox {
+  margin: 4px 0;
+}
+
+#zotero-prefpane-batchimport h2 {
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+#zotero-prefpane-batchimport h3 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 1em;
+  font-weight: bold;
+}
+
+/* Table container */
+.virtualized-table-container {
+  border: 1px solid var(--fill-quinary);
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+#batchimport-table-container {
+  width: 100%;
+  height: 100%;
+}

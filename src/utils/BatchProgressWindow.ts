@@ -60,19 +60,19 @@ export class BatchProgressWindow {
   }
 
   open(): void {
-    const ww = Components.classes[
+    const ww = (Components.classes as any)[
       "@mozilla.org/embedcomp/window-watcher;1"
-    ].getService(Components.interfaces.nsIWindowWatcher);
+    ].getService(Components.interfaces.nsIWindowWatcher) as nsIWindowWatcher;
 
     const features =
       "chrome,titlebar,centerscreen,resizable=yes,width=340,height=600";
 
     this.win = ww.openWindow(
-      Zotero.getMainWindow(),
+      Zotero.getMainWindow() as any,
       "about:blank",
       "_blank",
       features,
-      null,
+      null as any,
     ) as Window;
 
     this.win.addEventListener(
@@ -447,16 +447,21 @@ export class BatchProgressWindow {
 
     this.notifierID = Zotero.Notifier.registerObserver(
       {
-        notify: (event: string, type: string, ids: number[]) => {
+        notify: (event: string, type: string, ids: Array<string | number>) => {
           if (type === "item") {
             if (event === "add") {
-              ids.forEach((id) => this.importedItemIDs.add(id));
+              ids.forEach((id) =>
+                this.importedItemIDs.add(
+                  typeof id === "number" ? id : parseInt(id, 10),
+                ),
+              );
             } else if (event === "modify") {
               ids.forEach(async (id) => {
                 try {
-                  const item = await Zotero.Items.getAsync(id);
+                  const numId = typeof id === "number" ? id : parseInt(id, 10);
+                  const item = await Zotero.Items.getAsync(numId);
                   if (item && item.getField && item.getField("title")) {
-                    this.recognizedItemIDs.add(id);
+                    this.recognizedItemIDs.add(numId);
                   }
                 } catch (e) {
                   // Ignore errors
@@ -486,15 +491,6 @@ export class BatchProgressWindow {
         (this.elements.importingMeter as unknown as HTMLProgressElement).value =
           importPercent;
       }
-    }
-
-    if (this.importedItemIDs.size > 0) {
-      const metadataPercent = Math.min(
-        100,
-        Math.round(
-          (this.recognizedItemIDs.size / this.importedItemIDs.size) * 100,
-        ),
-      );
     }
   }
 
